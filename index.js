@@ -1,37 +1,19 @@
 const express = require('express')   //importing express
 const app = express()  //create an express application
-const port = 3000  //define a port
+const cors = require('cors');
+const port = 5000  //define a port
+var router = express.Router() ; //we creating a nested router
+const { notesRouter } = require("./api/v1/index")
+require("./db/index");
 
+app.use(express.json());
+app.use(cors());
+// root (/)
 app.get('/', (req, res) => {
   res.send('Hello World!')
 })
-app.get('/hamza', (req, res) => {
-  const person= {
-    name:"Hamza Iqbal",
-    semester: "7th",
-    Rollnumber: "18K1068",
-    Goals: ["CAR","200 BIKE", "Big House", "AAA"]
-  };
-  res.json(person)  //javascript object notation
-})
-app.get('/friends', (req, res) => {
-  const person= [{
-    name:"Salman",
-    Designation: "Quranic Teacher"
-  },
-  {
-    name:"Noman",
-    Designation: "Quranic Teacher"},
-  {
-    name:"Atta ur Rehman",
-    Designation: "Salesman"
-  },
-  {
-    name:"Mubeen",
-    Designation: "Salesman"
-  }];
-  res.json(person)  //javascript object notation
-})
+
+
 app.get('/cousins', (req, res) => {
   const person= [{
     name:"Saad",
@@ -47,7 +29,7 @@ app.get('/cousins', (req, res) => {
   ];
   res.json(person)  //javascript object notation
 })
-
+app.use("/notes", notesRouter)
 app.listen(port, () => {  //run the app on port
   console.log(`Example app listening at http://localhost:${port}`)
 })
