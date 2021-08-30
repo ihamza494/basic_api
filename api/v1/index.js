@@ -1,6 +1,7 @@
 const express = require('express')   //importing express
 var notesRouter = express.Router()  //we creating a nested router
 const mongoose = require("mongoose");
+const noteModel = require('../../db/model/note.model');
 const Note = require("../../db/model/note.model");
 
 
@@ -16,7 +17,7 @@ notesRouter.get('/hamza', (req, res) => {
   })
   
   // notes ('/notes')
-  
+  //get all notes
   notesRouter.get('/', (request, response) => {
     Note.find({}, (err, notes) => {
       if (err) {
@@ -29,6 +30,7 @@ notesRouter.get('/hamza', (req, res) => {
     });
   
 });
+//add notes
 notesRouter.post('/', (request, response) => {
     console.log(request.body);
     const newNote = new Note(request.body);
@@ -40,14 +42,61 @@ notesRouter.post('/', (request, response) => {
     });
     
   });
+
+  //get note by ID 
   notesRouter.get('/:id', (request, response) => {
-    response.json({
-      reply : ' notes by id success',
+    const noteId = request.params.id;
+    noteModel.findById(noteId, (err, note) => {
+        if(err){
+          return console.log(err);
+        }
+        if(!note){
+          return response.status(404).json({
+            message: "note not found",
+          });
+        }
+        response.json({
+          reply : ' notes by id success',
+          note,
+        });
+    })
+    
+  });
+
+  //delete note
+  notesRouter.delete('/:id', (request, response) => {
+    const noteId = request.params.id;
+    noteModel.findByIdAndRemove(noteId, (err, res) => {
+      console.log(err, res);
+        if(err){
+          return console.log(err);
+        }
+        if(!res){
+          return response.status(404).json({
+            messsage : 'note not found for deletion',
+          })
+        }
+        response.json({
+          reply : "delete note by id success",
+        });
     });
   });
-  notesRouter.delete('/:id', (request, response) => {
-    response.json({
-      reply : ' notes by id delete success',
+  notesRouter.put('/:id', (request, response) => {
+    const noteId = request.params.id;
+    const updatedBody = request.body;
+    noteModel.findByIdAndUpdate(noteId, updatedBody, {new: true}, (err, updatedNote) => {
+        if(err){
+          return console.log(err);
+        }
+        if(!updatedNote){
+          return response.status(404).json({
+            messsage : 'note not found for updation ',
+          })
+        }
+        response.json({
+          reply : "updated note by id success",
+          note : updatedNote,
+        });
     });
   });
 
